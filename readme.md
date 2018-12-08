@@ -15,7 +15,8 @@ Of note, I recommend you change the `DOCUMENT_ROOT`, `MYSQL_ROOT_PASSWORD`, `MYS
 If you have your own virtual host files for `apache` you can place them in `etc/apache2/sites-available` to have them configured on the container.
 
 ###### SSL Certs
-Place your SSL Certificates in `etc/apache2/ssl`
+Place your SSL Certificates in `etc/apache2/ssl` \
+_create the folder if it doesn't exist_
 
 ###### MySQL Database
 If you already have a `MySQL` database you can copy it to `var/lib/mysql` to have the container use that data.
