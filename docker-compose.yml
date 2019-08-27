@@ -21,8 +21,7 @@ services:
       - ${SSL_DIR}:/etc/apache2/ssl
   mysql:
     build:
-      context: ./
-      dockerfile: mysql.Dockerfile
+      context: ./mysql
     container_name: 'mysql'
     restart: 'always'
     ports:
@@ -30,21 +29,32 @@ services:
     volumes:
       - ./var/lib/mysql:/var/lib/mysql
       - ./${LOG_DIR}/mysql:/log/mysql
+      - ./mysql/conf.d:/etc/mysql/conf.d
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: 'phpMyAdmin'
+  mysql-slave:
+    build:
+      context: ./mysql-slave
+    container_name: 'mysql-slave'
+    restart: 'always'
+    depends_on:
+      - mysql
+    ports:
+      - '33060:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MASTER_USER: ${MASTER_USER}
+      MASTER_PASSWORD: ${MASTER_PASSWORD}
+      MASTER_HOST: ${MASTER_HOST}
+    volumes:
+      - ./mysql-slave/conf.d:/etc/mysql/conf.d
+      - ./mysql-slave/scripts:/root/scripts
     links:
       - mysql
-    environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-    ports:
-      - ${PMA_PORT}:80
-    volumes:
-      - /sessions
